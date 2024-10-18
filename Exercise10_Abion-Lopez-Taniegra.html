@@ -1,0 +1,504 @@
+<!--
+BSIT 3A - Exercise 10
+Abion, John Matthew
+Lopez, Novie Lei
+Taniegra, Ron Vincent -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Exercise10_Abion-Lopez-Taniegra.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.min.js"></script>
+    <script src="Exercise10_Abion-Lopez-Taniegra.js"></script>
+    <script>
+        currentQueueNumber = 1; 
+        queueNumber = ""; 
+        queueList = []; 
+        $(document).ready(function() {
+            $("#queueResultDialog").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    "Close": function() {
+                        $(this).dialog("close");
+                        $(".queue-form").css("display", "none");
+                        $("#accordion-container").css("display", "block");
+                        $("#getQueueBtn").css("display", "block");
+                    }
+                }
+            });
+            $("#getQueueBtn").on('click', function() {
+                GenerateQueueNumber();
+                $(this).css("display", "none");
+                
+                $("#accordion-container").css("display", "none");
+                $(".queue-form").css("display", "block");
+            });
+            $("form").on("submit", function(event) {
+                event.preventDefault();         
+                SubmitQueue(); 
+            } );
+            $("input[type='radio']").checkboxradio();
+            $( "fieldset" ).controlgroup();
+            $(document).tooltip();
+            $( ".accordion" ).accordion();
+        });
+       
+        
+        function GenerateQueueNumber() {
+            var queuePrefix = "Q";
+            var generatedQueueNumber = queuePrefix + currentQueueNumber.toString().padStart(4, '0');
+            
+            queueNumber = generatedQueueNumber; 
+            currentQueueNumber++;
+        }
+        function SubmitQueue() {
+            var transactionType = $("input[name='transaction']:checked").next("label").text();
+            var studentNumber = $("#stud_no").val();
+            var emailAddress = $("#email").val();
+            var firstName = $("#first_name").val();
+            var middleName = $("#middle_name").val();
+            var lastName = $("#last_name").val();
+            var extensionName = $("#extension_name").val();
+
+            if (hasInvalidCharacters(firstName) || hasInvalidCharacters(middleName) || hasInvalidCharacters(lastName)) {
+                alert("Names can only contain alphabetic characters and spaces.");
+                return;
+            } else if (!validateStudentNumber(studentNumber)) {
+                alert("Student Number must be in YY-##### (e.g. 24-00123) format.");
+                return;
+            } else if (!validateInstitutionalEmail(emailAddress)){
+                alert("Email Address must be in surname_name@plpasig.edu.ph (e.g. delacruz_juan@plapasig.edu.ph) format.");
+                return;
+            }
+            
+            var confirmText = "Confirm Details \n\n" + 
+                            "Transaction: " + transactionType +
+                            "\nStudent Number: " + studentNumber +
+                            "\nEmail Address: " + emailAddress + 
+                            "\nFirst Name: " + firstName + 
+                            "\nMiddle Name: " + middleName + 
+                            "\nLast Name: " + lastName + 
+                            "\nExtension Name: " + extensionName +
+                            "\n\n Press [Cancel] to Edit";
+
+            if (confirm(confirmText)) {
+                queueList.push({queueNumber, transactionType, studentNumber, emailAddress, firstName, middleName, lastName, extensionName});
+                
+                $("input[type='text']").val('');
+                $("select").val('');
+                
+                $('input[name="transaction"]').prop('checked', false);
+                $('input[name="transaction"]').checkboxradio("refresh");
+                
+                var transactionSummary = "<p><b>Queue No:</b> " + queueNumber + "</p>" +
+                                        "<p><b>Transaction Type:</b> " + transactionType + "</p>" +
+                                        "<p><b>Student Number:</b> " + studentNumber + "</p>" +
+                                        "<p><b>Email Address:</b> " + emailAddress + "</p>" +
+                                        "<p><b>First Name:</b> " + firstName + "</p>" +
+                                        "<p><b>Middle Name:</b> " + middleName + "</p>" +
+                                        "<p><b>Last Name:</b> " + lastName + "</p>" +
+                                        "<p><b>Extension Name:</b> " + extensionName + "</p>";
+                
+                $("#queueResultDialog").html(transactionSummary);
+                $("#queueResultDialog").dialog("open");
+
+                queueNumber = ""; 
+            }
+        }
+
+        function UpdateQueueList(data) {
+            var queueListDiv = $(".queue-list");
+            queueListDiv.innerHTML = "<p><b>Queue No:</b> " + data.queueNumber + "</p>" +
+                        "<p><b>Transaction Type:</b> " + data.transactionType + "</p>" +
+                         "<p><b>Student Number:</b> " + data.studentNumber + "</p>" +
+                         "<p><b>Email Address:</b> " + data.emailAddress + "</p>" +
+                         "<p><b>First Name:</b> " + data.firstName + "</p>" +
+                         "<p><b>Middle Name:</b> " + data.middleName + "</p>" +
+                         "<p><b>Last Name:</b> " + data.lastName + "</p>" +
+                         "<p><b>Extension Name:</b> " + data.extensionName + "</p>"
+
+        }
+
+        function hasInvalidCharacters(str) {
+            return /[^a-zA-Z\s]/.test(str);
+        }
+
+        function validateStudentNumber(studentNumber) {
+            var studentNumberPattern = /^\d{2}-\d{5}$/;
+            return studentNumberPattern.test(studentNumber);
+        }
+
+        function validateInstitutionalEmail(email) {
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@plpasig\.edu\.ph$/;
+            return emailPattern.test(email);
+        }
+
+    </script>
+    <title>PLP Registrar | Queueing System</title>
+</head>
+<body>
+    <div class="flex-container">
+        <div class="header">
+            <img src="plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo">
+            <h1>PLP Registrar Queueing System</h1>
+        </div>
+        <div class="main-container">
+            <button id="getQueueBtn" class="btn">Get Queue Number</button>
+            <div id="accordion-container">
+                <h1>Printing-Related Transactions:</h1>
+                <div class="accordion">
+                    <h3>Request for Grades</h3>
+                    <div>
+                        <p>
+                            Description: Students can request an official printed copy of their grades for a specific term or semester.<br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Request for Certificate of Registration (COR)</h3>
+                        <div>
+                            <p>
+                                Description: A printed copy of the student's Certificate of Registration, detailing the subjects enrolled for the current academic term. <br><br>
+                                Required Details:
+                            </p>
+                            <ul>
+                                <li>Student number</li>
+                                <li>Institutional email</li>
+                                <li>Complete name</li>
+                            </ul>
+                        </div>
+                        <h3>Request for Certificate of Enrollment</h3>
+                        <div>
+                            <p>
+                                Description: A document certifying that the student is currently enrolled in a specific program and term. Usually needed for external requirements (e.g., bank loans, scholarships). <br><br>
+                                Required Details:
+                            </p>
+                            <ul>
+                                <li>Student number</li>
+                                <li>Institutional email</li>
+                                <li>Complete name</li>
+                            </ul>
+                        </div>
+                        <h3>Request for Good Moral Certificate</h3>
+                        <div>
+                            <p>
+                                Description: Students can request a printed certificate of good moral standing, usually required for transferring schools, job applications, or scholarships. <br><br>
+                                Required Details:
+                            </p>
+                            <ul>
+                                <li>Student number</li>
+                                <li>Institutional email</li>
+                                <li>Complete name</li>
+                            </ul>
+                        </div>
+                        <h3>Request for Honorable Dismissal</h3>
+                        <div>
+                            <p>
+                                Description: A formal document for students transferring to another institution, certifying their honorable dismissal from the current school.  <br><br>
+                                Required Details:
+                            </p>
+                            <ul>
+                                <li>Student number</li>
+                                <li>Institutional email</li>
+                                <li>Complete name</li>
+                            </ul>
+                        </div>
+                        <h3>Request for Diploma/Certificate of Graduation</h3>
+                        <div>
+                            <p>
+                                Description: A printed copy of the student’s diploma or certificate of graduation, usually requested after completing a program.  <br><br>
+                                Required Details:
+                            </p>
+                            <ul>
+                                <li>Student number</li>
+                                <li>Institutional email</li>
+                                <li>Complete name</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h1>Non-Printing-Related Transactions:</h1>
+                    <div class="accordion">
+                        <h3>Document Processing (e.g., Transcript of Records, Certifications)</h3>
+                        <div>
+                        <p>
+                            Description: Students may apply for official documents such as a Transcript of Records (digital or printed) or certifications for various purposes. <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Dropping of Subjects</h3>
+                        <div>
+                        <p>
+                            Description: Students may drop one or more subjects within a set period. This usually involves non-printable digital processing unless a confirmation slip is issued.  <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Rectification of Grades</h3>
+                        <div>
+                        <p>
+                            Description: If a grade discrepancy arises, students may request the registrar’s assistance in rectifying the recorded grade.  <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Request for Transfer Credentials</h3>
+                        <div>
+                        <p>
+                            Description: For students transferring to another institution, transfer credentials (including official records and recommendations) must be processed, which usually does not require printing.<br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Change of Program or Course</h3>
+                        <div>
+                        <p>
+                            Description: A formal request to change the student’s academic program or course of study. This involves non-printable processing but can require institutional approval.<br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Request for Leave of Absence (LOA)</h3>
+                        <div>
+                        <p>
+                            Description: Students may apply for a temporary leave of absence for personal or medical reasons, allowing them to pause their academic studies.<br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Shifting of Subjects</h3>
+                        <div>
+                        <p>
+                            Description: If a student needs to change their enrolled subjects (often due to class availability or schedule conflicts), they can request subject shifting without needing printed materials.  <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Request for Academic Evaluation</h3>
+                        <div>
+                        <p>
+                            Description: Students can request an official academic evaluation to check their progress in completing the requirements of their program. <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Request for Re-admission</h3>
+                        <div>
+                        <p>
+                            Description: A request for re-admission after a student has been on leave or academically inactive. The process is usually done electronically.  <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                        <h3>Request for Late Enrollment</h3>
+                        <div>
+                        <p>
+                            Description: A formal request by students who missed the regular enrollment period, seeking permission to enroll late.  <br><br>
+                            Required Details:
+                        </p>
+                        <ul>
+                            <li>Student number</li>
+                            <li>Institutional email</li>
+                            <li>Complete name</li>
+                        </ul>
+                        </div>
+                    </div>
+                    <h1>General Information Required for All Transactions:</h1>
+                    <div class="accordion">
+                        <h3>Student Number</h3>
+                        <div>
+                        <p>
+                            Unique identifier assigned to each student for tracking.
+                        </p>
+                        </div>
+                        <h3>Institutional Email</h3>
+                        <div>
+                        <p>
+                            Official school email used for all correspondence.
+                        </p>
+                        </div>
+                        <h3>Complete Name</h3>
+                        <div>
+                        <p>
+                            Full legal name for identification purposes.
+                        </p>
+                        </div>
+                    </div>
+            </div>
+            <div class="queue-form" style="display: none;">
+                <h1>Enter Details</h1>
+                <form>
+                    <div class="form-container">
+                        <div class="form-left">
+                            <fieldset>
+                                <legend>Select a Transaction: </legend>
+                            
+                                <h3><b>Printing-Related Transactions:</b></h3>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="grades-request" required>
+                            <label for="grades-request">Request for Grades</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="cor-request">
+                            <label for="cor-request">Request for Certificate of Registration (COR)</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="enrollment-request">
+                            <label for="enrollment-request">Request for Certificate of Enrollment</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="good-moral-request">
+                            <label for="good-moral-request">Request for Good Moral Certificate</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="honorable-dismissal-request">
+                            <label for="honorable-dismissal-request">Request for Honorable Dismissal</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="diploma-request">
+                            <label for="diploma-request">Request for Diploma/Certificate of Graduation</label>
+                        </div>
+                    
+                        <h3><b>Non-Printing-Related Transactions:</b></h3>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="document-processing">
+                            <label for="document-processing">Document Processing (e.g., Transcript of Records, Certifications)</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="dropping-subjects">
+                            <label for="dropping-subjects">Dropping of Subjects</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="grade-rectification">
+                            <label for="grade-rectification">Rectification of Grades</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="transfer-credentials">
+                            <label for="transfer-credentials">Request for Transfer Credentials</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="change-program">
+                            <label for="change-program">Change of Program or Course</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="leave-of-absence">
+                            <label for="leave-of-absence">Request for Leave of Absence (LOA)</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="shifting-subjects">
+                            <label for="shifting-subjects">Shifting of Subjects</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="academic-evaluation">
+                            <label for="academic-evaluation">Request for Academic Evaluation</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="re-admission">
+                            <label for="re-admission">Request for Re-admission</label>
+                        </div>
+                    
+                        <div class="radio-box">
+                            <input type="radio" name="transaction" id="late-enrollment">
+                            <label for="late-enrollment">Request for Late Enrollment</label>
+                        </div>
+                    </fieldset>
+                        </div>
+                        <div class="form-right">
+                            <label for="stud_no">Student Number</label><br>
+                            <input type="text" placeholder="Enter Student Number" name="stud_no" id="stud_no" title="Student Number: YY-##### (e.g. 24-00123)"><br>
+
+                            <label for="email">Institutional Email</label><br>
+                            <input type="text" placeholder="Enter PLP Email Address" name="email" id="email" required title="PLP Email Address: surname_name@plpasig.edu.ph (e.g. delacruz_juan@plapasig.edu.ph)"><br>
+
+                            <label for="first_name">First Name</label><br>
+                            <input type="text" placeholder="Enter First Name" name="first_name" id="first_name" required title="e.g. Juan"><br>
+
+                            <label for="middle_name">Middle Name</label><br>
+                            <input type="text" placeholder="Enter Middle Name" name="middle_name" id="middle_name" title="e.g. Santos"><br>
+
+                            <label for="last_name">Last Name</label><br>
+                            <input type="text" placeholder="Enter Last Name" name="last_name" id="last_name" required title="e.g. Dela Cruz"><br>
+        
+                            <label for="extension_name">Extension Name</label><br>
+                            <select name="extension_name" id="extension_name">
+                                <option value="">None</option>
+                                <option value="Sr.">Sr.</option>
+                                <option value="Jr.">Jr.</option>
+                                <option value="II">II</option>
+                                <option value="III">III</option>
+                            </select><br>
+        
+                            <input type="submit" id="submit" value="Submit Queue">
+                            <input type="reset" value="Reset">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+    <div id="queueResultDialog" title="Queue Confirmation"></div>
+</body>
+</html>

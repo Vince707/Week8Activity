@@ -1,0 +1,98 @@
+/*
+BSIT 3A - Exercise 10
+Abion, John Matthew
+Lopez, Novie Lei
+Taniegra, Ron Vincent
+*/
+* {
+    font-family: "Oswald";
+}
+body{
+    margin: 0%;
+    overflow-x: hidden;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1440px;
+    background-color: #347928;
+    padding: 40px;
+}
+.header img {
+    position: absolute;
+    left: 20px;
+    max-width: 100px;
+    height: auto;
+}
+.header h1 {
+    color: white;
+    margin: 0;
+    text-align: center;
+}
+.flex-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-around;
+    height: max-content;
+}
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-between;
+    height: max-content;
+    padding: 50px;
+}
+
+input[type=text] {
+    width: 240px;
+    height: 25px;
+    padding: 5px;
+    border-radius: 50px;
+    padding-left: 15px;
+}
+select {
+    width: 253px;
+    height: 40px;
+    padding: 5px;
+    border-radius: 50px;
+    padding-left: 15px;
+}
+input[type=submit], input[type=reset]{
+    width: 100px;
+    height: 25px;
+    border-radius: 50px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+input[type=submit]:hover, input[type=reset]:hover{
+    width: 110px;
+    height: 30px;
+    border-radius: 50px;
+    margin-top: 10px;
+}
+
+.form-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-left, .form-right {
+    width: 45%;
+    height: 430px;
+}
+
+.form-left {
+    overflow-y: scroll;
+}
+
+#getQueueBtn {
+    height: 80px;
+    font-size: 36px;
+    font-weight: bold;
+    border-radius: 50px;
+    margin-top: 10px;
+    cursor: pointer;
+}
